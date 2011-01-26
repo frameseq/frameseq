@@ -87,7 +87,9 @@ Note that  _all file names should be inclosed in single quotes_.
 ### Running with detailed options
 
 In some cases, you might want to meddle a bit with the *options.pl* file to run the program on your own data.
-The options are facts of the form: option(Key,Value).
+The options are facts of the form:
+
+	option(Key,Value).
 
 The following is a list describing the purpose of each option:
 
@@ -101,7 +103,7 @@ This is the name of the functor which is used to read the probability of a predi
 
 You will only need to change this if the score functor of your format is different from the defaul value *'start_codon_probability'*.
 
-#### * score_categories
+#### score_categories
 ##### Syntax
 	option(score_categories,100).
 ##### Description
