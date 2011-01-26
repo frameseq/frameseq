@@ -4,7 +4,7 @@ version(0.1).
 
 :- 
    write('*****************************************************'),nl,
-   write('* This is the framebias model '),
+   write('* This is the frameseq model '),
    version(V), 
    write('version '), 
    write(V), 
@@ -14,8 +14,15 @@ version(0.1).
    write('*****************************************************'),
    nl.
 
+:- write('Attempting to load options from file: options.pl ... '),nl,
+   [options].
+ 
+
 h :-
-        system('less README').
+	readFile('README.markdown',ContentBytes),
+	atom_codes(ContentStr,ContentBytes),
+	write(ContentStr).
+
 
 filter(PredictionsFile,TrainingDataFile,FilteredPredictionsFile) :-
         run_model(framebias, 

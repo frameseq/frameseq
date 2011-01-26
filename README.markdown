@@ -1,7 +1,7 @@
 frameseq
 ========
 
-This is the Frame Bias Model for selection of gene finder predictions (stops).
+This is the _frameseq_ model for improved selection of gene finder predictions (stops).
 
 It is a probabilistic model which selects/ranks a sequence of gene predictions
 from some gene finder based on the score given by the gene finder and the general
@@ -12,7 +12,8 @@ Setting up the software
 
 First, a few things must be done to setup the system. 
 
-1. Download and install [PRISM](http://sato-www.cs.titech.ac.jp/prism/). The Frame Bias Model was tested to work with version 2.0 of PRISM.
+1. Download and install [PRISM](http://sato-www.cs.titech.ac.jp/prism/). 
+   frameseq was tested to work with version 2.0 of PRISM.
 2. Setup paths in lost.pl
 
 There are three facts which you will probably need to change:
@@ -40,7 +41,7 @@ be greeted by a message followed by an interactive prompt, that looks like this:
 
 At this prompt, you can load the Frame Bias Model by typing (disregarding the prompt characters): 
 
-	| ?- [framebias].
+	| ?- [frameseq].
 
 After this you can run a particular inference using the model. 
 
@@ -81,3 +82,78 @@ where,
 Running this query will output a various evaluation metrics such as sensitivity and specificity.
 
 Note that  _all file names should be inclosed in single quotes_.
+
+
+### Running with detailed options
+
+In some cases, you might want to meddle a bit with the *options.pl* file to run the program on your own data.
+The options are facts of the form: option(Key,Value).
+
+The following is a list describing the purpose of each option:
+
+#### score_functor
+##### Syntax
+	option(score_functor,start_codon_probability).
+##### Description
+This is the name of the functor which is used to read the probability of a prediction. For instance, with a genemark predictions, e.g.
+
+	genemark_gene_prediction(na,909370,909462,'+',1,[average_probability(0.13),start_codon_probability(0.87)]).
+
+You will only need to change this if the score functor of your format is different from the defaul value *'start_codon_probability'*.
+
+#### * score_categories
+##### Syntax
+	option(score_categories,100).
+##### Description
+This is used in the discretization phase. It dictates how many
+symbolic values, that will be used to represent the numeric values of
+the scores of predictions
+
+#### learn_method 
+##### Syntax
+	option(learn_method,prism).
+##### Description
+This option specifies the method that is used to derive the
+probability parameters of the model. Usually the setting 
+'prism' is the best option, since this method uses pseudo counts
+to deal with sparse data. The value 'custom' can be used if
+'prism' takes too long.. 
+
+#### divide_genome
+##### Syntax
+	option(divide_genome,true).	
+##### Description
+This option indicates that the genome should be divided into two
+parts (origin -> terminus) and (terminus -> origin) and separate
+analysis will be run on each part
+
+#### origin
+##### Syntax
+	option(origin, 12345). 
+##### Description	
+This option specifies the position of the origin in the genome.
+This is only relevant it the option split_annotate has the value true
+(which it has by default).
+
+#### terminus 
+##### Syntax
+	option(terminus, 12345). 
+##### Description
+This option specifies the position of the origin in the genome.
+This is only relevant it the option split_annotate has the value true
+(which it has by default).
+
+#### override_delete_probability
+##### Syntax
+	option(override_delete_probability,false).	
+##### Description
+This is option can be used to enforce a particular probability of 
+deleting a prediction. This can be used to control the false
+positive rate.  
+To set a particular delete probability of 0.5 you would have
+
+	option(override_delete_probability, 0.5).
+	
+The default setting is 'false', which means that the program
+will automatically infer the delete probability based on the
+the size of the given training data.
