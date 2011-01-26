@@ -1,0 +1,156 @@
+:-set_prism_flag(log_scale,on).
+%:-set_prism_flag(log_viterbi,on). % PRISM 1
+% Using vb seems to give an undesired effect with the pseudo-counts 
+% To much smoothing I expect...
+% :-set_prism_flag(learn_mode,params).  
+:-set_prism_flag(learn_mode,both).  
+
+%msw(X,Y) :- values(X,Z), member(Y,Z).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Constraint management
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+max_consequtive_deletes(1000). % Real is 888
+
+init_store :-
+   asserta(store(0)).
+
+forward_store(S) :-
+   asserta(store(S))
+   ;
+   retract(store(S)).
+
+%% get_store(S)
+%
+% Get the current store
+get_store(S) :- !, store(S).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reporting progress 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+nop.
+report_step(1000).
+
+report_progress :-
+        program_counter(C),
+        retractall(program_counter(_)),
+        report_step(StepSize),
+        RotStep is C mod StepSize,
+        ((RotStep==0) ->
+                write(C),nl,
+                write(garbage_collecting),nl,
+                garbage_collect,
+                statistics
+                ;
+                nop
+                ),
+        C1 is C + 1,
+        assert(program_counter(C1)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lists as integers management
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+assert_list(List) :-
+        assert_list(1,List).
+
+assert_list(MaxIdx,[]) :-
+        assert(end_of_list(MaxIdx)).
+
+assert_list(Idx,[E|Es]) :-
+       assert(list_elem(Idx,E)),
+       NxtIdx is Idx + 1,
+       assert_list(NxtIdx,Es).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% For learning with a single switch at a time
+dummy_pgoal(SwName,Outcome) :-
+        msw(SwName,Outcome).
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% Values decls %%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+frames([1,2,3,4,5,6]).
+
+% parameters of model:
+values(trans(_),Frames) :-
+        frames(Frames).
+
+% The score is emitted from the frame
+values(emit(F), SC) :-
+        F \= delete,
+        frames(Frames),
+        member(F,Frames),
+        score_categories(SC).
+        
+values(emit(delete),Outcomes) :-
+        score_categories(SC),
+        frames(Frames),
+        findall((F,S), (member(F,Frames), member(S,SC)), Outcomes).
+
+values(goto_delete,[yes,no]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% Model definition %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Initiation:
+model(Observations):-
+   % select initial frame:
+   % Can probably just have uniform probability
+   retractall(list_elem(_,_)),
+   retractall(end_of_list(_)),
+   %retractall(store(_)),
+   %retractall(program_counter(_)),
+   %init_store,
+   %assert(program_counter(1)),
+   assert_list(Observations),
+   write('asserted list..'),nl,
+   !,
+   recursion(begin,0). % before first elem of list
+
+% recursion structure:
+% base case: The largest element in the list has already been processed
+recursion(_,ListIdx) :-
+        EOL is ListIdx + 1, % one larger than index of largest element in list
+        end_of_list(EOL).
+
+% recursive case:
+recursion(F,ListIdx) :-
+   end_of_list(EOL),
+   %write(ListIdx), write('-'), write(EOL),nl,
+   ListIdx < EOL,
+   %(debug_enabled(true) -> report_progress ; true),
+   msw(goto_delete,GotoDel),
+   ((GotoDel == yes) -> 
+        recursion_delete(F,ListIdx) 
+        ;
+        recursion_frame(F,ListIdx)).
+
+% Matching true positives
+recursion_frame(F,ListIdx) :-
+     %write(recursion_frame(F,ListIdx)),nl,
+     msw(trans(F), NextFrame),
+     msw(emit(NextFrame),Score),
+     NextListIdx is ListIdx + 1,
+     (learn_mode(true) ->
+        list_elem(NextListIdx,true_positive(NextFrame,Score))
+        ;
+        list_elem(NextListIdx,(NextFrame,Score))),
+     %write(keep(NextListIdx)),
+     recursion(NextFrame,NextListIdx).
+
+% Matching false positives
+recursion_delete(Frame,ListIdx) :-
+    %write(recursion_delete(Frame,ListIdx)),nl,
+    NextListIdx is ListIdx + 1,
+    (learn_mode(true) ->
+        list_elem(NextListIdx,false_positive(NextFrame,Score))
+        ;
+        list_elem(NextListIdx,(NextFrame,Score))),
+    msw(emit(delete), (NextFrame,Score)),
+    %write(delete(NextListIdx)),
+    recursion(Frame,NextListIdx).

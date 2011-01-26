@@ -1,0 +1,4 @@
+This is a simple "top model", that given a set of predictions with
+scores selects the best scoring gene prediction for each stop codon.
+E.g. the final set of predictions will only contain one prediction per
+stop codon

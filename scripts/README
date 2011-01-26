@@ -1,0 +1,41 @@
+These directory contains some handy Prolog scripts:
+
+* ptt_to_prolog.pl 
+==================
+
+This is a small Prolog program which converts from Genbank PTT format to an internal
+Prolog format. 
+
+To run the program, first start PRISM, and at the interactive prompt type:
+
+| ?- [ptt_to_prolog].
+
+... This will load the program ...
+
+Then, when you get the prompt again type,
+
+| ?- ptt_to_prolog('../data/U00096.ptt','../data/U00096.ptt.pl').
+
+This is the command used to produce U00096.ptt.pl which is located in the data
+directory. The first argument in the input (PTT) file and the second argument
+is the name of a file where output is writted to.
+
+* genemark_to_prolog.pl 
+=======================
+
+This is a small Prolog program which converts from Genbank PTT format to an internal
+Prolog format. 
+
+To run the program, first start PRISM, and at the interactive prompt type:
+
+| ?- [genemark_to_prolog].
+
+... This will load the program ...
+
+Then, when you get the prompt again type,
+
+| ?- ptt_to_prolog('../data/genemark.report','../data/genemark.report.pl').
+
+This is the command used to produce genemark.report.pl which is located in the data
+directory. The first argument in the input (PTT) file and the second argument
+is the name of a file where output is writted to.
