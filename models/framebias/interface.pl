@@ -1,19 +1,16 @@
 :- ['../../lost.pl'].
 :- lost_include_api(misc_utils).
-:- lost_include_api(viterbi_learn).
 
 lost_option(annotate,score_functor,score,'A functor that specifies a member of the Extra list in each prediction which has score').
 lost_option(annotate,score_categories,50,'An integer specifying how many discrete groups to divide scores into').
 lost_option(annotate,learn_method,prism,'Species which routine to use for learning. Options are prism and custom.').
 lost_option(annotate,debug,false,'Whether to report debugging information.').
 lost_option(annotate,override_delete_probability,false,'Lets the user manually override the delete probability').
-lost_option(annotate,split_annotate,true,'Used to specify that the 
-
 
 % Inherit options from annotate:
 lost_option(split_annotate,Name,Default,Description) :-	lost_option(annotate,Name,Default,Description).
 lost_option(split_annotate,terminus,0,'Specifies location of terminus on the genome.').
-lost_option(split_annotate,terminus,0,'Specifies location of origin on the genome.').
+lost_option(split_annotate,origin,0,'Specifies location of origin on the genome.').
 
 lost_input_formats(annotate, [text(prolog(ranges(gene))), text(prolog(ranges(gene)))]).
 lost_input_formats(split_annotate, [text(prolog(ranges(gene))), text(prolog(ranges(gene)))]).
@@ -45,7 +42,7 @@ set_debug(Options) :-
 annotate([GenbankFile,PredictionsFile],Options,OutputFile) :-
         write('annotate called'),nl,
         % Learn is always invoked before annotate (it's fast, so no worries)
-        run_model(genome_filter,
+        run_model(framebias,
                   learn([GenbankFile,PredictionsFile],Options,ParametersFile)),
 
         % Options hadling:
@@ -55,7 +52,7 @@ annotate([GenbankFile,PredictionsFile],Options,OutputFile) :-
 		set_debug(Options),
 		
         % Load model
-        prism(genome_finder_nolist),
+        prism(model),
         assert(learn_mode(false)), % Tell model that we want to do predictions now
        % Load gene finder predictions
         terms_from_file(PredictionsFile,GeneFinderPredictionsUnsorted),
@@ -130,10 +127,10 @@ split_annotate([GenbankFile,PredictionsFile],Options,OutputFile) :-
 	delete(Options,terminus(_),Options1),
 	delete(Options1,origin(_),Options2),
 	
-	write(run_model(genome_filter,annotate([RefOriTerFile,PredOriTerFile],Options2,OriTerResultFile))),nl,
-	run_model(genome_filter,annotate([RefOriTerFile,PredOriTerFile],Options2,OriTerResultFile)),
-	write(run_model(genome_filter,annotate([RefTerOriFile,PredTerOriFile],Options2,TerOriResultFile))),nl,
-	run_model(genome_filter,annotate([RefTerOriFile,PredTerOriFile],Options2,TerOriResultFile)),
+	write(run_model(frame_bias,annotate([RefOriTerFile,PredOriTerFile],Options2,OriTerResultFile))),nl,
+	run_model(frame_bias,annotate([RefOriTerFile,PredOriTerFile],Options2,OriTerResultFile)),
+	write(run_model(frame_bias,annotate([RefTerOriFile,PredTerOriFile],Options2,TerOriResultFile))),nl,
+	run_model(frame_bias,annotate([RefTerOriFile,PredTerOriFile],Options2,TerOriResultFile)),
 	
 	terms_from_file(OriTerResultFile,OriTerResults),
 	terms_from_file(TerOriResultFile,TerOriResults),
@@ -205,11 +202,11 @@ learn([GenbankFile,PredictionsFile],Options,OutputFile) :-
 	).
 
 learn_prism([GenbankFile,PredictionsFile],Options,OutputFile) :-
-       prism(genome_finder_nolist),
+       prism(model),
        assert(learn_mode(true)),
        get_option(Options, score_functor, ScoreFunctor),
        get_option(Options,score_categories,NumScoreGroups),
-        set_debug(Options),
+       set_debug(Options),
        terms_from_file(GenbankFile,RefGenesUnsorted),
        write('::: sorting genes in golden standard file'),nl,
        sort(RefGenesUnsorted,RefGenes),
@@ -220,28 +217,29 @@ learn_prism([GenbankFile,PredictionsFile],Options,OutputFile) :-
        write(' genes.'),nl,
        scores_from_terms(ScoreFunctor,Predictions,Scores),
        threshold_list_from_scores(Scores,NumScoreGroups,ThresholdList),
-	write('ThresholdList: '), nl,
-	write(ThresholdList),nl,
-        write('Classifying predictions into true and false positives.'),nl,
-        classify_predictions(Predictions,RefGenes,ClassifiedPredictions),
-        write('Create frame/score input list for model.'),nl,
-        frame_score_list_from_predictions(ScoreFunctor,ClassifiedPredictions,PredictionScorePairs),
-        write('Discretizing scores from gene finder.'),nl,
-        threshold_discrete_frame_score_pairs(ThresholdList,PredictionScorePairs,PredictionScorePairsDiscrete),
-        write('Determining number of score categories'),nl,
-        groups_from_count(NumScoreGroups,ScoreCategories),
-        assert(score_categories(ScoreCategories)),
-        terms_to_file('test.file',PredictionScorePairsDiscrete),
-        write('before learning: '),nl,
-        assert(learn_mode(true)),
-        learn([model(PredictionScorePairsDiscrete)]),
-        show_sw,
-        write('Saving parameters to file: '), write(OutputFile), nl,
-        save_sw(OutputFile),nl,
-        retractall(learn_mode(_)).
+       write('ThresholdList: '), nl,
+       write(ThresholdList),nl,
+       write('Classifying predictions into true and false positives.'),nl,
+       classify_predictions(Predictions,RefGenes,ClassifiedPredictions),
+       terms_to_file('tp_fp.pl',ClassifiedPredictions),
+       write('Create frame/score input list for model.'),nl,
+       frame_score_list_from_predictions(ScoreFunctor,ClassifiedPredictions,PredictionScorePairs),
+       write('Discretizing scores from gene finder.'),nl,
+       threshold_discrete_frame_score_pairs(ThresholdList,PredictionScorePairs,PredictionScorePairsDiscrete),
+       write('Determining number of score categories'),nl,
+       groups_from_count(NumScoreGroups,ScoreCategories),
+       assert(score_categories(ScoreCategories)),
+       terms_to_file('test.file',PredictionScorePairsDiscrete),
+       write('before learning: '),nl,
+       assert(learn_mode(true)),
+       learn([model(PredictionScorePairsDiscrete)]),
+       show_sw,
+       write('Saving parameters to file: '), write(OutputFile), nl,
+       save_sw(OutputFile),nl,
+       retractall(learn_mode(_)).
 
 learn_custom([GenbankFile,PredictionsFile],Options,OutputFile) :-
-       prism(genome_finder),
+       prism(model),
        get_option(Options, score_functor, ScoreFunctor),
        get_option(Options,score_categories,NumScoreGroups),
        terms_from_file(GenbankFile,RefGenesUnsorted),
@@ -381,7 +379,7 @@ classify_predictions([P|PredictionsRest],RefGenes,[true_positive(P)|TaggedRest])
         ((S=='+') ->
         	Match =.. [RefFunctor,_,_,R,S,_,_]
            	;
-                Match =.. [RefFunctor,_,L,_,S,_,_]),
+            Match =.. [RefFunctor,_,L,_,S,_,_]),
         member(Match,RefGenes),
         !,
    	classify_predictions(PredictionsRest,RefGenes,TaggedRest).

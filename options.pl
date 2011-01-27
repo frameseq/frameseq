@@ -5,12 +5,17 @@
 % You might want to change value to fit your needs. 
 
 
+%% OPTION: prediction_functor
+% This is the name of the functor which is used in the format of the predictions.
+option(prediction_functor,genemark_gene_prediction).
+
 %% OPTION: score_functor
 % This is the name of the functor which is used to read the probability
 % of a prediction. For instance, with a genemark predictions, e.g.
 % genemark_gene_prediction(na,909370,909462,'+',1,[average_probability(0.13),start_codon_probability(0.87)]).
 % we use the value 'start_codon_probability':
 option(score_functor,start_codon_probability).
+
 
 %% OPTION: score_categories
 % This is used in the discretization phase. It dictates how many
@@ -31,19 +36,19 @@ option(learn_method,prism).
 % This option specifies the position of the origin in the genome.
 % This is only relevant it the option split_annotate has the value true
 % (default).
-option(origin, 12345). 
+option(origin,3923500). 
 
 %% OPTION: terminus 
 % This option specifies the position of the origin in the genome.
 % This is only relevant it the option split_annotate has the value true
 % (default).
-option(terminus, 12345). 
+option(terminus,1588800). 
 
 %% OPTION: divide_genome
 % This option indicates that the genome should be divided into two
 % parts (origin -> terminus) and (terminus -> origin) and separate
 % analysis will be run on each part
-option(divide_genome,true).
+option(divide_genome,false).
 
 
 %% OPTION: override_delete_probability
