@@ -65,8 +65,9 @@ where,
 
 For instance, to run the filter on the supplied sample data (E-coli K12, MG1665), you would type:
 
-	| ?- filter('data/genemark.report.pl','data/U00095.ptt.pl','data/filter_results.pl').
+	| ?- filter('$FRAMESEQ/data/genemark.report.pl','$FRAMESEQ/frameseq/data/U00095.ptt.pl','$FRAMESEQ/data/filter_results.pl').
 
+You should replace the text *$FRAMESEQ* with the _absolute_ path the the directory where the frameseq repository resides.
 
 ### Evaluating the results:
 
@@ -84,14 +85,22 @@ Running this query will output a various evaluation metrics such as sensitivity 
 Note that  _all file names should be inclosed in single quotes_.
 
 
-### Running with detailed options
+Running with detailed options
+-----------------------------
 
 In some cases, you might want to meddle a bit with the *options.pl* file to run the program on your own data.
 The options are facts of the form:
 
 	option(Key,Value).
 
-The following is a list describing the purpose of each option:
+In the following is a list describing the purpose of each option is presented. The _Value_ given in the
+syntax of the option should be understand as the _default_ value.
+
+#### score_functor
+##### Syntax
+	option(prediction_functor,genemark_gene_prediction).
+##### Description
+This is the name of the functor which is used in the format of the predictions.
 
 #### score_functor
 ##### Syntax
