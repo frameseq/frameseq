@@ -18,13 +18,12 @@ lost_input_formats(split_annotate, [text(prolog(ranges(gene))), text(prolog(rang
 lost_output_format(annotate, _,text(prolog(ranges(gene)))).
 lost_output_format(split_annotate, _,text(prolog(ranges(gene)))).
 
+% Set/unset debug mode
 set_debug(Options) :-
-	get_option(Options,debug,DebugEnabled),
-	% Set/unset debug mod
-	((DebugEnabled==true) ->
+	(get_option(Options,debug,true) ->
 		assert(debug_enabled(true))
 		;
-		assert(debug_enabled(false))).
+		assert(debug_enabled(false))).		
 		
 		
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,22 +38,21 @@ set_debug(Options) :-
 % - Extract the sequence of visited states from the viterbi tree
 % - Create a set of predictions from the sequence of visited states
 % - write the set of predictions to OutputFile
-annotate([GenbankFile,PredictionsFile],Options,OutputFile) :-
+
+annotate([ModelFile,PredictionsFile],Options,OutputFile) :-
         write('annotate called'),nl,
         % Learn is always invoked before annotate (it's fast, so no worries)
-        run_model(framebias,
-                  learn([GenbankFile,PredictionsFile],Options,ParametersFile)),
 
         % Options hadling:
         get_option(Options,score_categories,NumScoreGroups),
         get_option(Options,score_functor,ScoreFunctor),
 		get_option(Options,override_delete_probability,OverrideDelete),
 		set_debug(Options),
-		
+
         % Load model
         prism(model),
         assert(learn_mode(false)), % Tell model that we want to do predictions now
-       % Load gene finder predictions
+       	% Load gene finder predictions
         terms_from_file(PredictionsFile,GeneFinderPredictionsUnsorted),
         % Make sure prediction are sorted
         sort(GeneFinderPredictionsUnsorted,GeneFinderPredictions),
@@ -69,7 +67,7 @@ annotate([GenbankFile,PredictionsFile],Options,OutputFile) :-
         retractall(score_categories(_)),
         assert(score_categories(ScoreCategories)), % Tell prism how many score categories
         % Restore model parameters
-        restore_sw(ParametersFile),
+        restore_sw(ModelFile),
 		% Override delete probability if requested
 		((OverrideDelete==false) ->
 			true
@@ -131,15 +129,14 @@ split_annotate([GenbankFile,PredictionsFile],Options,OutputFile) :-
 	run_model(frame_bias,annotate([RefOriTerFile,PredOriTerFile],Options2,OriTerResultFile)),
 	write(run_model(frame_bias,annotate([RefTerOriFile,PredTerOriFile],Options2,TerOriResultFile))),nl,
 	run_model(frame_bias,annotate([RefTerOriFile,PredTerOriFile],Options2,TerOriResultFile)),
-	
+
 	terms_from_file(OriTerResultFile,OriTerResults),
 	terms_from_file(TerOriResultFile,TerOriResults),
 
 	append(OriTerResults,TerOriResults,AllResults),
 	sort(AllResults,SortedResults),
 	terms_to_file(OutputFile,SortedResults).
-	
-	
+
 list_from_genbank_file(File,List) :-
         open(File,read,Stream),
         read(Stream,model(List)),
@@ -206,7 +203,11 @@ learn_prism([GenbankFile,PredictionsFile],Options,OutputFile) :-
        assert(learn_mode(true)),
        get_option(Options, score_functor, ScoreFunctor),
        get_option(Options,score_categories,NumScoreGroups),
+
        set_debug(Options),
+		write(here),nl,
+
+
        terms_from_file(GenbankFile,RefGenesUnsorted),
        write('::: sorting genes in golden standard file'),nl,
        sort(RefGenesUnsorted,RefGenes),
@@ -282,6 +283,7 @@ learn_terminate_probability(Predictions) :-
        set_sw(terminate,[TerminateProb,NoTerminateProb]).
 
 learn_frame_transitions(GenbankTerms) :-
+		write(here1),nl,
         % first, fix delete prob and score categories probs to zero 
         % in order to learn transition probabilities only
         toggle_disable_delete(yes),
@@ -291,6 +293,7 @@ learn_frame_transitions(GenbankTerms) :-
         assert(score_categories([0])),
 
         map(add_unit_score,FrameList,ObservationList),
+		write(here),nl,
         learn([model(ObservationList)]),
         retract(score_categories(_)).
         toggle_disable_delete(no).

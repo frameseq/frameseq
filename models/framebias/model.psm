@@ -26,6 +26,7 @@ forward_store(S) :-
 % Get the current store
 get_store(S) :- !, store(S).
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Reporting progress 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,6 +69,13 @@ assert_list(Idx,[E|Es]) :-
 %% For learning with a single switch at a time
 dummy_pgoal(SwName,Outcome) :-
         msw(SwName,Outcome).
+
+%toggle_disable_delete(yes) :-
+%	retractall(disable_delete(_)),
+%	assert(disable_delete(S)).
+	
+%toggle_disable_delete(no) :-
+%	retractall(disable_delete(_)).
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%% Values decls %%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,6 +132,11 @@ recursion(F,ListIdx) :-
    %write(ListIdx), write('-'), write(EOL),nl,
    ListIdx < EOL,
    %(debug_enabled(true) -> report_progress ; true),
+%   catch(disable_delete(DisableDelete),_,DisableDelete=no),
+%    ((DisableDelete==yes) ->
+%            GotoDel = no
+%            ;
+%   msw(goto_delete,GotoDel)),
    msw(goto_delete,GotoDel),
    ((GotoDel == yes) -> 
         recursion_delete(F,ListIdx) 

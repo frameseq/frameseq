@@ -1,5 +1,7 @@
 These directory contains some handy Prolog scripts:
 
+Before you use them, be sure to have setup paths correctly in the top-level lost.pl file.
+
 * ptt_to_prolog.pl 
 ==================
 
@@ -18,12 +20,12 @@ Then, when you get the prompt again type,
 
 This is the command used to produce U00096.ptt.pl which is located in the data
 directory. The first argument in the input (PTT) file and the second argument
-is the name of a file where output is writted to.
+is the name of a file where output is written to.
 
 * genemark_to_prolog.pl 
 =======================
 
-This is a small Prolog program which converts from Genbank PTT format to an internal
+This is a small Prolog program which converts from Genemark report format format to an internal
 Prolog format. 
 
 To run the program, first start PRISM, and at the interactive prompt type:
@@ -34,8 +36,8 @@ To run the program, first start PRISM, and at the interactive prompt type:
 
 Then, when you get the prompt again type,
 
-| ?- ptt_to_prolog('../data/genemark.report','../data/genemark.report.pl').
+| ?- genemark_to_prolog('../data/genemark_report_ecoli','../data/genemark_report_ecoli.pl').
 
-This is the command used to produce genemark.report.pl which is located in the data
-directory. The first argument in the input (PTT) file and the second argument
-is the name of a file where output is writted to.
+This is the command used to produce genemark_report_ecoli.pl (or overwrite it, if it is there) 
+which is located in the data directory. The first argument in the input file and the second argument
+is the name of a file where output is written to.
