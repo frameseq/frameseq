@@ -50,16 +50,16 @@ After this you can run a particular inference using the model.
 For instance, you mau want to filter predictions from a gene finder to remove potential 
 false positives. To do this, you type:
 
-	| ?- filter(PredictionsFile,TrainingDataFile,FilteredPredictionsFile).
+	| ?- filter(TrainingDataFile,PredictionsFile,FilteredPredictionsFile).
 
 where,
 
-- *PredictionsFile* points to a file in Prolog format, which contains all of the predictions from the 
-  gene finder. In scripts, you will found genemark_to_prolog which converts a report in the format
-  producted by genemark to the expected Prolog format. 
 - *TrainingDataFile* points to a file with training data. Typically, this is derived from a GenBank PTT file or similar.
   In the scripts directory there is a Prolog file, ptt_to_prolog.pl, which can be used to convert a PTT file to a 
   Prolog file of the right format.
+- *PredictionsFile* points to a file in Prolog format, which contains all of the predictions from the 
+  gene finder. In scripts, you will found genemark_to_prolog which converts a report in the format
+  producted by genemark to the expected Prolog format. 
 - *FilteredPredictionsFile* points to a filename where the results of running the model (a subset of the originally
   predicted genes) will be written to.
 
