@@ -11,7 +11,7 @@ lost_input_formats(annotate, [text(prolog(ranges(gene)))]).
 lost_output_format(annotate, _, text(prolog(ranges(gene)))).
 
 annotate([InputFile],Options,OutputFile) :-
-        write('--------------------  start'),nl,
+    write('--------------------  start'),nl,
 	consult(InputFile),
 	get_option(Options,prediction_functor,PredFunctorOpt),
 	((PredFunctorOpt == auto) -> file_functor(InputFile,PredFunctor) ;  PredFunctor = PredFunctorOpt),
@@ -30,7 +30,8 @@ annotate([InputFile],Options,OutputFile) :-
 	write(' predictions to file '),
 	write(OutputFile),
 	nl,
-	terms_to_file(OutputFile,BestPredictions).
+	sort(BestPredictions,BestPredictionsSorted),
+	terms_to_file(OutputFile,BestPredictionsSorted).
 
 select_prediction(_,[BestPrediction],BestPrediction).
 

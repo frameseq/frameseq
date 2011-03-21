@@ -35,12 +35,12 @@ genedb_distinct_stop_codons(PredFunctor,DistinctStops) :-
 	eliminate_duplicate(AllStops,DistinctStops).
 
 genedb_predictions_for_stop_codon(PredFunctor,[StopCodonEnd,'+',Frame],Predictions) :-
-	FindGoal =.. [ PredFunctor, _,  Start,StopCodonEnd,'+',Frame,Extra],
-	BuildGoal =.. [ PredFunctor, _, Start,StopCodonEnd,'+',Frame,Extra],
+	FindGoal =.. [ PredFunctor, Identifier,  Start,StopCodonEnd,'+',Frame,Extra],
+	BuildGoal =.. [ PredFunctor, Identifier, Start,StopCodonEnd,'+',Frame,Extra],
 	findall(BuildGoal,FindGoal,Predictions).
 
 genedb_predictions_for_stop_codon(PredFunctor,[StopCodonEnd,'-',Frame],Predictions) :-
-	FindGoal =.. [ PredFunctor, _, StopCodonEnd,End,'-',Frame,Extra],
-	BuildGoal =.. [ PredFunctor, _, StopCodonEnd,End,'-',Frame,Extra],
+	FindGoal =.. [ PredFunctor, Identifier, StopCodonEnd,End,'-',Frame,Extra],
+	BuildGoal =.. [ PredFunctor, Identifier, StopCodonEnd,End,'-',Frame,Extra],
 	findall(BuildGoal,FindGoal,Predictions).
 

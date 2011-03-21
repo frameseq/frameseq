@@ -6,6 +6,12 @@
 % use the trained model to filter the predictions for an
 % E. Coli. genome
 
+delete_probability_step_size(0.05).
+
+delete_probability_min(0.1).
+
+delete_probability_max(1.0).
+
 training_reference_file(F) :-
 	lost_data_directory(DataDir),
 	atom_concat(DataDir,'NC_004631.ptt.pl',F).
@@ -50,12 +56,17 @@ run_filtering_with_delete_prob(P) :-
 	filtered_predictions_accuracy_file(FiltPredAccFile,P),
 	train(TrainingReferenceFile, TrainingPredictionsFile, ModelFile), 
 	filter(ModelFile, PredictionsFile, FiltPredFile),
-	evaluate(PredictionsReferenceFile, FiltPredFile, FiltPredAccFile).
+	catch(evaluate(PredictionsReferenceFile, FiltPredFile, FiltPredAccFile),_,true). % Last file may not exist, because of no predictions
 	
 run_filter_delete_prob_sequence :-
-	number_sequence(0.1,1.0,0.1,S),
+	delete_probability_sequence(S),
 	forall(member(P,S),run_filtering_with_delete_prob(P)).
 	
+delete_probability_sequence(Seq) :-
+	delete_probability_min(Min),
+	delete_probability_max(Max),
+	delete_probability_step_size(StepSize),
+	number_sequence(Min,Max,StepSize,Seq).
 	
 % Creates a list of sequence of numbers... 
 number_sequence(Start,End,_,[End]) :- Start >= End.
@@ -66,17 +77,41 @@ number_sequence(Start,End,Step,[Start|Rest]) :-
 	number_sequence(Next,End,Step,Rest).
 
 create_r_data_file :-
-	number_sequence(0.1,1.0,0.1,S),
+	delete_probability_sequence(S),
 	findall((100,P,F), (member(P,S), filtered_predictions_accuracy_file(F,P)),AllResults),
 	write(AllResults),nl,
 	r_data_file(RDataFile),
         tell(RDataFile),
+	create_r_data_header,
 	delete_state_probability_experiment1_report(AllResults),
 	told.
 
-delete_state_probability_experiment1_report([]).
-delete_state_probability_experiment1_report([(SGs,P,AccFile)|Rest]) :-
+create_r_data_header :-
+	write('ScoreGroups'),
+	write('\t'),
+	write('DeleteProbability'),
+	write('\t'),
+	write('TotalPredicted'),
+	write('\t'),
+	write('StopsCorrect'),
+	write('\t'),
+	write('StopWrong'),
+	write('\t'),
+	write('StopSensitivity'),
+	write('\t'),
+	write('StopSpecificity'),
+	write('\n').
 
+
+delete_state_probability_experiment1_report([]).
+
+% Some times the last file contains no predictions at all
+delete_state_probability_experiment1_report([(SGs,P,AccFile)|Rest]) :-
+	not(file_exists(AccFile)),
+	!.
+	
+
+delete_state_probability_experiment1_report([(SGs,P,AccFile)|Rest]) :-
         terms_from_file(AccFile,Terms),
         member(accuracy_report(genes_predicted,TotalPredicted),Terms),
         member(accuracy_report(gene_stops_correct,CorrectStops),Terms),

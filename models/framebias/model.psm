@@ -2,7 +2,7 @@
 %:-set_prism_flag(log_viterbi,on). % PRISM 1
 % Using vb seems to give an undesired effect with the pseudo-counts 
 % To much smoothing I expect...
-% :-set_prism_flag(learn_mode,params).  
+%:-set_prism_flag(learn_mode,params).  
 :-set_prism_flag(learn_mode,both).  
 
 %msw(X,Y) :- values(X,Z), member(Y,Z).

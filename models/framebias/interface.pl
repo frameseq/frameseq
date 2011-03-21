@@ -235,6 +235,7 @@ learn_prism([GenbankFile,PredictionsFile],Options,OutputFile) :-
        assert(learn_mode(true)),
        learn([model(PredictionScorePairsDiscrete)]),
        show_sw,
+	   show_sw_h,
        write('Saving parameters to file: '), write(OutputFile), nl,
        save_sw(OutputFile),nl,
        retractall(learn_mode(_)).
