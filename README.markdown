@@ -11,12 +11,12 @@ This work is supported by the
 project ``Logic-statistic modelling and analysis of biological sequence data''
 funded by the NABIIT program under the Danish Strategic Research Council.
 
-See: http://lost.ruc.dk
+See: [LoSt website][http://lost.ruc.dk]
 
 Thanks to:
-- The LoSt group 
-- The developers of PRISM
-- The anynomous reviewers of the article
+- The LoSt group for valuable discussions
+- The developers of PRISM (We love PRISM)
+- The anynomous reviewers of the article who provided excellent feedback
 
 Setting up the software
 -----------------------
