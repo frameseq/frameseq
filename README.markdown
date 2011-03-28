@@ -144,10 +144,14 @@ You will need to change filenames accordingly in the beginning of the script. Th
 the filtering multiple times to produce various trade-offs between sensitivity and specificity 
 (by varying the delete probability). They produce a file (in the data directory) for each of these trade-offs.
 
-These scripts are run by entering the scripts, starting prism, and typing the name of the file enclosed in
-brackets and run (disregarding the prompt characters): 
+These scripts are run by entering the scripts directory. Then starting starting prism (PRISM prompt appears). Finally
+typing the name of the script enclosed in brackets and then the command *run*
 
-	| ?- [bacillus], run.
+Disregarding the prompt characters, here is what you what do to run the bacillus script:
+
+	| ?- [bacillus].
+	...
+	| ?- run.
 
 
 ### Running with detailed options
