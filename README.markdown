@@ -7,6 +7,17 @@ It is a probabilistic model which selects/ranks a sequence of gene predictions
 from some gene finder based on the score given by the gene finder and the general
 tendency that genes are picky about the reading frames of the neighbor genes.
 
+This work is supported by the
+project ``Logic-statistic modelling and analysis of biological sequence data''
+funded by the NABIIT program under the Danish Strategic Research Council.
+
+See: http://lost.ruc.dk
+
+Thanks to:
+- The LoSt group 
+- The developers of PRISM
+- The anynomous reviewers of the article
+
 Setting up the software
 -----------------------
 
@@ -44,6 +55,8 @@ At this prompt, you can load the Frame Bias Model by typing (disregarding the pr
 	| ?- [frameseq].
 
 After this you can run a particular inference using the model. 
+
+The scripts directory contains several examples for running the examples in the paper.  
 
 ### Filtering using the model
 
