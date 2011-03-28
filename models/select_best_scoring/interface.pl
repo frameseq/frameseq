@@ -41,7 +41,7 @@ annotate([InputFile],Options,OutputFile) :-
 select_good_predictions(_,_,[],[]).
 select_good_predictions(ScoreFunctor,Threshold,[P|Ps],[P|GPs]) :-
         score_wrap(ScoreFunctor,P,[Score,P]), % use score wrap to extract score
-        Score > Threshold,
+        Score >= Threshold,
         !,
         select_good_predictions(ScoreFunctor,Threshold,Ps,GPs).
 select_good_predictions(ScoreFunctor,Threshold,[_|Ps],GPs) :-
