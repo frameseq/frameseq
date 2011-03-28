@@ -14,9 +14,10 @@ funded by the NABIIT program under the Danish Strategic Research Council.
 See: [LoSt website][http://lost.ruc.dk]
 
 Thanks to:
-- The LoSt group for valuable discussions
-- The developers of PRISM (We love PRISM)
-- The anynomous reviewers of the article who provided excellent feedback
+
+-       The LoSt group for valuable discussions
+-       The developers of PRISM (We love PRISM)
+-       The anynomous reviewers of the article who provided excellent feedback
 
 Setting up the software
 -----------------------
