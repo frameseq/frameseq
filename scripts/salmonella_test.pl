@@ -1,6 +1,10 @@
 :- ['../lost.pl'].
 :- ['../frameseq'].
 
+run_exp(Fil1,Fil2) :-
+	write(Fil1),nl,
+	write(Fil2),nl.
+
 % The salmonella test
 % To avoid overfitting we train on a salmonella genome and 
 % use the trained model to filter the predictions for an
@@ -95,7 +99,7 @@ create_r_data_header :-
 	write('\t'),
 	write('StopsCorrect'),
 	write('\t'),
-	write('StopWrong'),
+	write('StopsWrong'),
 	write('\t'),
 	write('StopSensitivity'),
 	write('\t'),
@@ -109,7 +113,6 @@ delete_state_probability_experiment1_report([]).
 delete_state_probability_experiment1_report([(SGs,P,AccFile)|Rest]) :-
 	not(file_exists(AccFile)),
 	!.
-	
 
 delete_state_probability_experiment1_report([(SGs,P,AccFile)|Rest]) :-
         terms_from_file(AccFile,Terms),

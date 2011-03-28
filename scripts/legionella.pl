@@ -1,8 +1,7 @@
 :- ['../lost.pl'].
 :- ['../frameseq'].
 
-% The salmonella test
-% To avoid overfitting we train on a salmonella genome and 
+% To avoid overfitting we train on a Legionella genome and 
 % use the trained model to filter the predictions for an
 % E. Coli. genome
 
@@ -14,11 +13,11 @@ delete_probability_max(1.0).
 
 training_reference_file(F) :-
 	lost_data_directory(DataDir),
-	atom_concat(DataDir,'NC_000913.ptt.pl',F).
+	atom_concat(DataDir,'legionella_pneumophila.ptt.pl',F).
 
 training_predictions_file(F) :-
 	lost_data_directory(DataDir),
-	atom_concat(DataDir,'NC_000913.Glimmer3.pl',F).
+	atom_concat(DataDir,'genemark_report_legionella_pneumophila.pl',F).
 
 predictions_reference_file(F) :-
 	lost_data_directory(DataDir),
@@ -26,30 +25,28 @@ predictions_reference_file(F) :-
 
 predictions_file(F) :-
 	lost_data_directory(DataDir),
-	atom_concat(DataDir,'NC_000913.Glimmer3.pl',F).
+	atom_concat(DataDir,'genemark_report_escherichia_coli.pl',F).
 
 filtered_predictions_file(F,Id) :-
 	lost_data_directory(DataDir),
 	atom_integer(IdAtom,Id),
-	atom_concat_list([DataDir,'glimmer_trained_predictions_',IdAtom,'.pl'],F).
+	atom_concat_list([DataDir,'legionella_pneumophila_trained_predictions_',IdAtom,'.pl'],F).
 
 filtered_predictions_accuracy_file(F,Id) :-
 	lost_data_directory(DataDir),
 	atom_integer(IdAtom,Id),
-	atom_concat_list([DataDir,'glimmer_trained_accuracy_',IdAtom,'.pl'],F).
+	atom_concat_list([DataDir,'legionella_pneumophila_trained_accuracy_',IdAtom,'.pl'],F).
 
 r_data_file(F) :-
 	lost_data_directory(DataDir),
-	atom_concat_list([DataDir,'r_data_glimmer_frameseq.tab'],F).
+	atom_concat_list([DataDir,'r_data_legionella_pneumophila_trained.tab'],F).
 	
-test1 :-
+test :-
 	DelProb = 0.5,
 	run_filtering_with_delete_prob(DelProb).
 
 run_filtering_with_delete_prob(P) :-
 	set_option(override_delete_probability,P),
-	set_option(prediction_functor,glimmer3_gene_prediction),
-	set_option(score_functor,score),
 	training_reference_file(TrainingReferenceFile),
 	training_predictions_file(TrainingPredictionsFile),
 	predictions_reference_file(PredictionsReferenceFile),
@@ -62,8 +59,7 @@ run_filtering_with_delete_prob(P) :-
 	
 run :-
 	delete_probability_sequence(S),
-	forall(member(P,S),run_filtering_with_delete_prob(P)),
-	create_r_data_file.
+	forall(member(P,S),run_filtering_with_delete_prob(P)).
 	
 delete_probability_sequence(Seq) :-
 	delete_probability_min(Min),
@@ -79,7 +75,7 @@ number_sequence(Start,End,Step,[Start|Rest]) :-
 	Next is Start + Step,
 	number_sequence(Next,End,Step,Rest).
 
-create_r_data_file :-
+get_table :-
 	delete_probability_sequence(S),
 	findall((100,P,F), (member(P,S), filtered_predictions_accuracy_file(F,P)),AllResults),
 	write(AllResults),nl,
@@ -112,6 +108,7 @@ delete_state_probability_experiment1_report([]).
 delete_state_probability_experiment1_report([(SGs,P,AccFile)|Rest]) :-
 	not(file_exists(AccFile)),
 	!.
+	
 
 delete_state_probability_experiment1_report([(SGs,P,AccFile)|Rest]) :-
         terms_from_file(AccFile,Terms),

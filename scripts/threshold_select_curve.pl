@@ -6,15 +6,24 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 reference_file('NC_000913.ptt.pl').
-predictions_file('NC_000913.Glimmer3.pl').
 
-score_functor(score).
+% Genemark settings:
+predictions_file('genemark_report_ecoli.pl').
+score_functor(start_codon_probability).
+
+% Glimmer setting:
+% predictions_file('NC_000913.Glimmer3.pl').
+% score_functor(score).
+
 
 data_points(100).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % main goal: generate_roc_curve_data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+run :-
+	generate_roc_curve_data.
 
 generate_roc_curve_data :-
 	data_points(DataPoints),
@@ -43,7 +52,7 @@ generate_roc_curve_data :-
 	
 	
 create_r_data_header(S) :-
-	write(S,'DeleteProbability'),
+	write(S,'Threshold'),
 	write(S,'\t'),
 	write(S,'StopsCorrect'),
 	write(S,'\t'),
