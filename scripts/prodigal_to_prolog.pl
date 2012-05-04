@@ -8,3 +8,6 @@
 
 prodigal_to_prolog(ProdigalFile, PrologFile) :-
         parse_prodigal_file(ProdigalFile, PrologFile).
+
+sample :-
+	prodigal_to_prolog('../data/NC_000913.Prodigal-2.50', '../data/NC_000913.Prodigal-2.50.pl').

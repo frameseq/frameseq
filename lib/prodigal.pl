@@ -43,7 +43,7 @@ cds_first_line(Left,Right,'+',Frame) -->
 	spaces,
 	left_right(Left,Right),
 	spaces,
-	{ Frame is Left mod 3 }.
+	{ Frame is 1 + (Left mod 3) }.
 
 cds_first_line(Left,Right,'-',Frame) -->
 	spaces,
@@ -51,7 +51,7 @@ cds_first_line(Left,Right,'-',Frame) -->
 	spaces,
 	complement_left_right(Left,Right),
 	spaces,
-	{ Frame is Left mod 3 }.
+	{ Frame is 1 + (Left mod 3) }.
 
 cds_second_line(Extra) -->
 	spaces,
