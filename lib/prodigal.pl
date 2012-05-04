@@ -75,8 +75,13 @@ note_entry(Entry) -->
 	match_characters_except(Ex2,Value),
 	{
 		atom_codes(KeyAtom,Key),
-		atom_codes(ValueAtom,Value),
-		Entry =.. [ KeyAtom,ValueAtom ] % Might need quoting
+		catch(number_codes(Number,Value),_,Number=no),
+		((Number \= no) ->
+			Entry =.. [ KeyAtom, Number ]
+			;
+			atom_codes(ValueAtom,Value),
+			Entry =.. [ KeyAtom,ValueAtom ] % Might need quoting
+		)
 	}.
 
 left_right(Left,Right) -->
