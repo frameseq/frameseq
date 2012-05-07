@@ -13,6 +13,8 @@ lost_option(split_annotate,Name,Default,Description) :-	lost_option(annotate,Nam
 lost_option(split_annotate,terminus,0,'Specifies location of terminus on the genome.').
 lost_option(split_annotate,origin,0,'Specifies location of origin on the genome.').
 
+lost_option(learn,model,model,'Specifies which model to use.').
+
 lost_input_formats(annotate, [text(prolog(ranges(gene))), text(prolog(ranges(gene)))]).
 lost_input_formats(split_annotate, [text(prolog(ranges(gene))), text(prolog(ranges(gene)))]).
 
