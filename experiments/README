@@ -1,0 +1,33 @@
+This is a description of the experiments run for the paper describing
+frameseq
+
+
+The experiments have been performed using the frameseq framework with
+the generic frameseq_experiment.sh shellscript.
+
+The frameseq_experiment.sh takes 3 arguments:
+1: the genefinder input (glimmer, genemark or prodigal)
+3: training genome
+3: the model_structure: (o,ho,mm,homm) [ordinary, higher order, mixed
+   memory, higher order mixed memory] 
+4: the decoding species (default e.coli due to quality of annotation
+   [but glimmer/genemark bias])
+
+names experiments as concatenation of arguments
+generates process stats (time and memory)
+generates a report in results 
+generates a subfolder in results containing the files generated
+
+The following experiments have been performed:
+
+./frameseq_experiment.sh genemark escherichia o escherichia
+
+../results/genemark_escherichia_o_escherichia.stats
+../results/genemark_escherichia_o_escherichia.report
+../results/genemark_escherichia_o_escherichia/
+
+(for all 60  permutations)
+
+
+
+
