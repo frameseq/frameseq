@@ -6,6 +6,7 @@ lost_option(annotate,score_categories,50,'An integer specifying how many discret
 lost_option(annotate,learn_method,prism,'Species which routine to use for learning. Options are prism and custom.').
 lost_option(annotate,debug,false,'Whether to report debugging information.').
 lost_option(annotate,override_delete_probability,false,'Lets the user manually override the delete probability').
+lost_option(annotate,model,model,'Specifies which model to use.').
 
 % Inherit options from annotate:
 lost_option(split_annotate,Name,Default,Description) :-	lost_option(annotate,Name,Default,Description).
@@ -48,9 +49,10 @@ annotate([ModelFile,PredictionsFile],Options,OutputFile) :-
         get_option(Options,score_functor,ScoreFunctor),
 		get_option(Options,override_delete_probability,OverrideDelete),
 		set_debug(Options),
+        get_option(Options,model,Model),
 
         % Load model
-        prism(model),
+        prism(Model),
         assert(learn_mode(false)), % Tell model that we want to do predictions now
        	% Load gene finder predictions
         terms_from_file(PredictionsFile,GeneFinderPredictionsUnsorted),
@@ -199,10 +201,12 @@ learn([GenbankFile,PredictionsFile],Options,OutputFile) :-
 	).
 
 learn_prism([GenbankFile,PredictionsFile],Options,OutputFile) :-
-       prism(model),
-       assert(learn_mode(true)),
        get_option(Options, score_functor, ScoreFunctor),
        get_option(Options,score_categories,NumScoreGroups),
+       get_option(Options,model,Model),
+
+       prism(Model),
+       assert(learn_mode(true)),
 
        set_debug(Options),
 		write(here),nl,
@@ -241,9 +245,11 @@ learn_prism([GenbankFile,PredictionsFile],Options,OutputFile) :-
        retractall(learn_mode(_)).
 
 learn_custom([GenbankFile,PredictionsFile],Options,OutputFile) :-
-       prism(model),
        get_option(Options, score_functor, ScoreFunctor),
        get_option(Options,score_categories,NumScoreGroups),
+       get_option(Options,model,Model),
+
+       prism(Model),
        terms_from_file(GenbankFile,RefGenesUnsorted),
        write('::: sorting genes in golden standard file'),nl,
        sort(RefGenesUnsorted,RefGenes),
