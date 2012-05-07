@@ -12,7 +12,11 @@
 % PredictOrganism: The organism to predict on
 
 run(Min,Max,Step,Model,GeneFinder,TrainOrganism,PredictOrganism) :-
-        number_sequence(Min,Max,StepSize,Seq),
+        nl,
+        writeln('-------------------------'),
+        writeln(run(Min,Max,Step,Model,GeneFinder,TrainOrganism,PredictOrganism)),
+        number_sequence(Min,Max,Step,S),
+        writeln(S),
 	findall((100,P,F), (
                         member(P,S),
                         run_filtering_with_delete_prob(P,Model,GeneFinder,TrainOrganism,PredictOrganism),
@@ -73,19 +77,19 @@ predictions_reference_file(ecoli,F) :-
 	data_file('NC_000913.ptt.pl',F).
 
 filtered_predictions_file(Prob,Model,GeneFinder,TrainOrganism,PredictOrganism,F) :-
-        lost_base_directory(BaseDir),
+        lost_config(lost_base_directory,BaseDir),
         atom_concat(BaseDir,'/results/',DataDir),
 	atom_integer(IdAtom,Prob),
 	atom_concat_list([DataDir,'predictions_',Model,'_',GeneFinder,'_',TrainOrganism,'_',PredictOrganism,'_',IdAtom,'.pl'],F).
 
 filtered_predictions_accuracy_file(Prob,Model,GeneFinder,TrainOrganism,PredictOrganism,F) :-
-        lost_base_directory(BaseDir),
+        lost_config(lost_base_directory,BaseDir),
         atom_concat(BaseDir,'/results/',DataDir),
 	atom_integer(IdAtom,Prob),
 	atom_concat_list([DataDir,'accuracy_',Model,'_',GeneFinder,'_',TrainOrganism,'_',PredictOrganism,'_',IdAtom,'.pl'],F).
 
 r_data_file(Model,GeneFinder,TrainOrganism,PredictOrganism,F) :-
-        lost_base_directory(BaseDir),
+        lost_config(lost_base_directory,BaseDir),
         atom_concat(BaseDir,'/results/',DataDir),
 	atom_concat_list([DataDir,'stats_',Model,'_',GeneFinder,'_',TrainOrganism,'_',PredictOrganism,'.tab'],F).
 	

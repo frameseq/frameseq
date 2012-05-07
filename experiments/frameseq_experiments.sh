@@ -1,11 +1,11 @@
 #!/bin/sh
 
-exec &> ../results/$1_$2_$3_$4.stats
+MIN=0
+MAX=1
+STEP=0.1
 
-mkdir ../results/1$_$2_$3_$4
-
-cp ../scripts/
-
-(prism -g "[../scripts/tmp],test." > ../results/$1_$2_$3_$4.report &)
-
-
+# example training on E. coli.
+for model in model mm_model ho_model homm_model
+do
+prism -g "[run_experiment], run($MIN,$MAX,$STEP,$model,genemark,ecoli,ecoli)."
+done
