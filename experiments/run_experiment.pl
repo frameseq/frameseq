@@ -73,8 +73,8 @@ predictions_file(glimmer,ecoli,F) :-
 	data_file('NC_000913.Glimmer3.pl',F).
 
 % predictions_reference_file(+Organism,-File)
-predictions_reference_file(ecoli,F) :-
-	data_file('NC_000913.ptt.pl',F).
+predictions_reference_file(Organism,F) :-
+        training_reference_file(Organism,F).
 
 filtered_predictions_file(Prob,Model,GeneFinder,TrainOrganism,PredictOrganism,F) :-
         lost_config(lost_base_directory,BaseDir),
