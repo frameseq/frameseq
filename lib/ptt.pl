@@ -51,8 +51,9 @@ length(L) -->
         integer(L).
 
 
-pid(PID) -->
-        integer(PID).
+pid(PIDATOM) -->
+        integer(PID),
+        { number_codes(PID,PIDCODES),atom_codes(PIDATOM,PIDCODES) }.
 
 gene(Gene) -->
         non_spaces(GeneCodes),
