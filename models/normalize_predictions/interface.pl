@@ -3,18 +3,6 @@
 test :- 
         normalize_predictions(['testdata2.pl','NC_000913.ptt.pl'],[iterations(100),learning_rate(0.001),score_functor(start_codon_probability)],'normalized.pl').
 
-/*
-merge_predictions(InputFiles, Options, OutputFile) :-
-        findall(Predictions,
-                (member(F,InputFiles),
-                terms_from_file(F,Predictions)),
-                AllPredictions),
-        get_option(score_functors,Functors),
-        normalize_predictions(AllPredictions,Functors,NormPredictions),
-        flatten(NormPredictions,FlatNormPredictions),
-        terms_to_file(OutputFile,FlatNormPredictions).
-*/
-
 normalize_predictions([PredictionsFile,ReferenceGenes],Options,NormPredictionsFile) :-
         get_option(Options,learning_rate,LearnRate),
         get_option(Options,score_functor,ScoreFunctor),
@@ -28,6 +16,7 @@ normalize_predictions([PredictionsFile,ReferenceGenes],Options,NormPredictionsFi
         writeln(false_positives(NumFalsePositives)),
         scores_from_predictions(ScoreFunctor,TruePositives,TruePositiveScores),
         scores_from_predictions(ScoreFunctor,FalsePositives,FalsePositiveScores),
+        writeln(here),
         length(TruePositiveScores,TPLEN),
         length(FalsePositiveScores,FPLEN),
         sumlist(TruePositiveScores,TPTotal),
@@ -47,14 +36,13 @@ normalize_predictions([PredictionsFile,ReferenceGenes],Options,NormPredictionsFi
         write_normalized_predictions(A,B,ScoreFunctor,score,Predictions,OutStream),
         close(OutStream).
 
-
 write_normalized_predictions(_,_,_,_,[],_).
 write_normalized_predictions(A,B,OldScoreFunctor,NewScoreFunctor,[P|Ps],Stream) :-
-       P =.. [_,_,Left,Right,Strand,Frame,Extra],
+       P =.. [OrigFunctor,_,Left,Right,Strand,Frame,Extra],
        ScoreMatch =.. [ OldScoreFunctor, OldScore ],
        member(ScoreMatch,Extra),
        logistic_function(A,B,OldScore,NewScore),
-       NewP =.. [ prediction, Left, Right, Strand, Frame, [ score(NewScore), old_score(OldScore) ]],
+       NewP =.. [ prediction, na, Left, Right, Strand, Frame, [ score(NewScore), old_score(OldScore), origin(OrigFunctor) ]],
        write(Stream,NewP),
        write(Stream,'.\n'),
        !,

@@ -1,31 +1,15 @@
-% Simple model that aggregates multiple files into one.
-% Should be fast and with a very low memory footprint.
-
 :- ['../../lost.pl'].
 
 %% merge(+InputFiles,+Options,+OutputFile)
-% Merges all InputFiles in the OutputFile.
+% Merges all InputFiles in the OutputFile such that terms in output file
+% are sorted.
 merge(InputFiles,_Options,OutputFile) :-
-	open(OutputFile,write,Stream),
-	terms_from_files_to_stream(InputFiles,Stream),
-	close(Stream).
+	terms_from_files(InputFiles,FilesTerms),
+        flatten(FilesTerms,FlatTerms),
+        sort(FlatTerms,SortedTerms),
+        terms_to_file(OutputFile,SortedTerms).
 
-terms_from_files_to_stream([],_).
-terms_from_files_to_stream([File1|InputFilesRest],OutStream) :-
-        open(File1,read,InStream),
-        terms_from_stream_to_stream(InStream,OutStream),
-	close(InStream),
-	!,
-        terms_from_files_to_stream(InputFilesRest,OutStream).
-
-terms_from_stream_to_stream(InStream,OutStream) :-
-	read(InStream, T),
-	((T == end_of_file) ->
-	 true
-	;
-	 writeq(OutStream,T),
-	 write(OutStream,'.\n'),
-	 !,
-	 terms_from_stream_to_stream(InStream,OutStream)
-	).
-
+terms_from_files([],[]).
+terms_from_files([File1|InputFilesRest],[Terms1|TermsRest]) :-
+        terms_from_file(File1,Terms1),
+        terms_from_files(InputFilesRest,TermsRest).
