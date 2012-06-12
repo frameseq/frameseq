@@ -43,7 +43,10 @@ cds_first_line(Left,Right,'+',Frame) -->
 	spaces,
 	left_right(Left,Right),
 	spaces,
-	{ Frame1 is 1 + (Left mod 3), rotate_left(Frame1,Frame) }.
+	{       Frame1 is 1 + (Left mod 3), 
+                writeln(rotate_left(Frame1,Frame)),
+                rotate_left(Frame1,Frame) 
+        }. 
 
 cds_first_line(Left,Right,'-',Frame) -->
 	spaces,
