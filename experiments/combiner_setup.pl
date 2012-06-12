@@ -1,8 +1,14 @@
 :- ['../lost.pl'].
 
+:- lost_include_api(prodigal).
+
+prodigal_to_prolog(ProdigalFile, PrologFile) :-
+        parse_prodigal_file(ProdigalFile, PrologFile).
+
 setup_prodigal(NormalizedPredictions) :-
         lost_data_directory(Dir),
         atom_concat_list([Dir, 'NC_000913.ptt.pl'],RefSeq),
+        prodigal_to_prolog('../data/NC_000913.Prodigal-2.50', '../data/NC_000913.Prodigal-2.50.pl'),
         atom_concat_list([Dir, 'NC_000913.Prodigal-2.50.pl'],ProdigalPredictions),
 
         run_model(best_prediction_per_stop_codon,
@@ -31,7 +37,7 @@ setup_glimmer(NormalizedPredictions) :-
 setup_genemark(NormalizedPredictions) :-
         lost_data_directory(Dir),
         atom_concat_list([Dir, 'NC_000913.ptt.pl'],RefSeq),
-        atom_concat_list([Dir, 'genemark_report_ecoli.pl'],GlimmerPredictions),
+        atom_concat_list([Dir, 'NC_000913.GeneMark-2.5m.pl'],GlimmerPredictions),
 
         run_model(best_prediction_per_stop_codon,
                         annotate([GlimmerPredictions],[score_functor(start_codon_probability)],GlimmerPredictionsBest)),
@@ -48,6 +54,8 @@ setup_all :-
         setup_glimmer(F3),
         run_model(merge_predictions,
                         merge([F1,F2,F3],[],Merged)),
-        writeln(Merged).
+        writeln(Merged),
+        terms_from_file(Merged,MergedTerms),
+        terms_to_file('../data/all_on_ecoli.pl',MergedTerms).
 
 
