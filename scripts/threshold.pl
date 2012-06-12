@@ -8,12 +8,16 @@
 reference_file('NC_000913.ptt.pl').
 
 % Genemark settings:
-predictions_file('genemark_report_escherichia_coli.pl').
-score_functor(start_codon_probability).
+%predictions_file('genemark_report_escherichia_coli.pl').
+%score_functor(start_codon_probability).
 
 % Glimmer setting:
 % predictions_file('NC_000913.Glimmer3.pl').
 % score_functor(score).
+
+% Combiner settings:
+predictions_file('all_on_ecoli.pl').
+score_functor(score).
 
 data_points(100).
 
@@ -36,12 +40,14 @@ generate_roc_curve_data :-
     findall(Score,(member(P,Predictions),score_wrap(ScoreFunc,P,[Score,P])),Scores),
 	list_max(Scores,MaxScore),
 	list_min(Scores,MinScore),
+        writeln(max_score(MaxScore)),
+        writeln(min_score(MinScore)),
 	write(create_data_points(MinScore,MaxScore,DataPoints,DataPointsList)),nl,
 	create_data_points(MinScore,MaxScore,DataPoints,DataPointsList),
 	write(DataPointsList),nl,!,
 	% Do cut-offs at each reported score and report accuracy for that cutoff
         run_model(best_prediction_per_stop_codon,
-                  annotate([PredictionsFile],[prediction_functor(genemark_gene_prediction),score_functor(ScoreFunc)],UniqStopPredictions)),
+                  annotate([PredictionsFile],[prediction_functor(prediction),score_functor(ScoreFunc)],UniqStopPredictions)),
 	select_and_report(RefFile,UniqStopPredictions,DataPointsList,Results),!,
 	lost_data_directory(DataDir),
 	atom_concat_list([DataDir,'threshold_select_',PredFileName],ResultsFile),!,
